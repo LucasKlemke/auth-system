@@ -28,8 +28,8 @@ server.listen(PORT, () => {
   console.log(`📍 http://localhost:${PORT}`);
   console.log('');
   console.log('Rotas disponíveis:');
-  console.log('  POST /register  → Registrar usuário');
-  console.log('  POST /login     → Fazer login');
-  console.log('  POST /logout    → Fazer logout');
-  console.log('  GET  /me        → Obter perfil (protegida)');
+  console.log('  POST /api/register  → Registrar usuário');
+  console.log('  POST /api/login     → Fazer login');
+  console.log('  POST /api/logout    → Fazer logout');
+  console.log('  GET  /api/me        → Obter perfil (protegida)');
 });

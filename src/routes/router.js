@@ -11,28 +11,28 @@ export async function handleRoute(req,res) {
 
     try {
             // ===== ROTA: REGISTRO =====
-        if (path === '/register' && method === 'POST') {
+        if (path === '/api/register' && method === 'POST') {
         const body = await parseBody(req);
         const result = await authController.register(req, res, body);
         return sendJSON(res, result.status, result.data);
         }
 
         // ===== ROTA: LOGIN =====
-        if (path === '/login' && method === 'POST') {
+        if (path === '/api/login' && method === 'POST') {
         const body = await parseBody(req);
         const result = await authController.login(req, res, body);
         return sendJSON(res, result.status, result.data);
         }
 
         // ===== ROTA: LOGOUT =====
-        if (path === '/logout' && method === 'POST') {
+        if (path === '/api/logout' && method === 'POST') {
         const token = getTokenFromHeader(req);
         const result = await authController.logout(req, res, token);
         return sendJSON(res, result.status, result.data);
         }
 
         // ===== ROTA: PERFIL (PROTEGIDA) =====
-        if (path === '/me' && method === 'GET') {
+        if (path === '/api/me' && method === 'GET') {
         // Usa middleware para proteger a rota
         return authenticate(req, res, async () => {
             const result = await authController.getProfile(req, res);
