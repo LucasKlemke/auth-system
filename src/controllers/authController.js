@@ -1,0 +1,111 @@
+import { hashPassword, verifyPassword} from '../utils/auth.js'
+import { database } from '../storage/database.js'
+import { sessionStore} from '../storage/sessions.js'
+import { PASSWORD_MIN_LENGTH } from '../config/constants.js'
+
+class AuthController {
+    async register (req, res, body){
+        const { email, password} = body;
+
+        if (!email || !password){
+            return {
+                status: 400,
+                data: {error: 'Email e senha são obrigatórios'}
+            }
+        }
+
+        if (password.length < PASSWORD_MIN_LENGTH){
+            return {
+                status: 400,
+                data: {
+                    error: `Senha deve ter no mínimo ${PASSWORD_MIN_LENGTH} caracteres`
+                }
+            }
+        }
+
+        if (!email.includes('@')){
+            return {
+                status: 400,
+                data: {error: 'Email inválido'}
+            }
+        }
+
+        try {
+            const {hash, salt} = hashPassword(password)
+            const user = database.createUser(email, hash, salt)
+
+             return {
+                status: 201,
+                data: {
+                message: 'Usuário criado com sucesso',
+                user: user.toJSON()
+                }
+            };
+        } catch (error) {
+            return {
+                status: 409,
+                data: {error: error.message}
+            }
+        }
+    }
+
+    async login(req,res, body){
+        const {email, password} = body
+
+        if(!email || !password){
+            return {
+                status: 400,
+                data: {error: 'Email e senha são obrigatórios'}
+            }
+        }
+
+        const user = database.findByEmail(email);
+
+        if (!user){
+            return {
+                status: 401,
+                data: {  error: 'Credenciais inválidas'}
+            }
+        }
+
+        const isValid = verifyPassword(password, user.salt, user.passwordHash);
+
+        if(!isValid){
+            return {
+                status: 401,
+                data: {error: 'Credenciais inválidas'}
+            }
+        }
+
+        const token = sessionStore.create(user.id)
+
+        return {
+            status: 200,
+            data: {
+                message: 'Login realizado com sucesso',
+                token,
+                user: user.toJSON()
+            }
+        }
+    }
+
+    async logout(req, res, token){
+        if (token){
+            sessionStore.destroy(token);
+        }
+
+        return {
+            status: 200,
+            data: {message: 'Logout realizado com sucesso'}
+        }
+    }
+
+    async getProfile(req, res){
+        return {
+            status: 200,
+            data: {user: req.user.toJSON()}
+        }
+    }
+}
+
+export const authController = new AuthController()
