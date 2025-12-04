@@ -21,9 +21,10 @@ class AuthController {
                     error: `Senha deve ter no mínimo ${PASSWORD_MIN_LENGTH} caracteres`
                 }
             }
-        }
+        } 
 
-        if (!email.includes('@')){
+
+        if (!validateEmail(email)){
             return {
                 status: 400,
                 data: {error: 'Email inválido'}
@@ -109,3 +110,11 @@ class AuthController {
 }
 
 export const authController = new AuthController()
+
+const validateEmail = (email) => {
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+};
